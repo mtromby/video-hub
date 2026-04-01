@@ -3,6 +3,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  /*
+   * Softer type: cap emphasis at medium (500). `font-medium` maps to normal (400) so
+   * hierarchy uses color/spacing; use `font-semibold` when you need the strongest weight.
+   */
+  --font-weight-medium: 400;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 500;
+  --font-weight-extrabold: 500;
+  --font-weight-black: 500;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -23,63 +33,122 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-video-scrim: hsl(var(--video-scrim));
+  --color-video-control: hsl(var(--video-control));
+  --color-on-video: hsl(var(--on-video));
+  --color-video-gradient-mid: hsl(var(--video-gradient-mid));
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --primary: 240 5.9% 10%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
+  --radius: 0.875rem;
+  --video-scrim: 0 0% 0%;
+  --video-control: 0 0% 6%;
+  --on-video: 0 0% 100%;
+  --video-gradient-mid: 0 0% 0%;
+  --success: 152 56% 38%;
+  --success-foreground: 0 0% 99%;
+  --background: 40 33% 98%;
+  --foreground: 28 18% 12%;
+  --card: 40 28% 99%;
+  --card-foreground: 28 18% 12%;
+  --popover: 40 28% 99%;
+  --popover-foreground: 28 18% 12%;
+  --primary: 43 72% 38%;
+  --primary-foreground: 28 22% 8%;
+  --secondary: 38 18% 93%;
+  --secondary-foreground: 28 18% 14%;
+  --muted: 38 14% 93%;
+  --muted-foreground: 28 8% 48%;
+  --accent: 40 22% 92%;
+  --accent-foreground: 28 18% 14%;
+  --destructive: 0 72% 46%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 10% 3.9%;
+  --border: 38 16% 86%;
+  --input: 38 16% 86%;
+  --ring: 43 65% 42%;
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
+  --background: 28 10% 7%;
+  --foreground: 40 20% 96%;
+  --card: 28 9% 10%;
+  --card-foreground: 40 20% 96%;
+  --popover: 28 9% 11%;
+  --popover-foreground: 40 20% 96%;
+  --primary: 45 86% 58%;
+  --primary-foreground: 28 24% 8%;
+  --secondary: 28 8% 15%;
+  --secondary-foreground: 40 18% 92%;
+  --muted: 28 7% 16%;
+  --muted-foreground: 35 8% 63%;
+  --accent: 28 8% 18%;
+  --accent-foreground: 40 18% 94%;
+  --destructive: 0 62% 48%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --border: 30 8% 20%;
+  --input: 30 8% 20%;
+  --ring: 45 78% 52%;
+  --success: 152 48% 42%;
+  --success-foreground: 0 0% 99%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
+  /* Ensure Poppins wins over UA widget fonts and Tailwind’s font stack resolves */
+  html {
+    font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    font-size: 93.75%;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  textarea,
+  select,
+  optgroup {
+    font-family: inherit;
+    font-feature-settings: inherit;
+  }
+
   html,
   body,
   #root {
-    @apply h-full min-h-dvh w-full overflow-hidden bg-background text-foreground antialiased;
+    @apply h-full min-h-dvh w-full overflow-hidden bg-background font-sans text-foreground antialiased;
+  }
+}
+
+/* Ambient shell — visible on non-video tabs */
+@layer components {
+  .app-atmosphere {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 100% 70% at 50% -25%, hsl(var(--primary) / 0.16), transparent 58%),
+      radial-gradient(ellipse 55% 45% at 110% 85%, hsl(var(--primary) / 0.07), transparent 50%),
+      radial-gradient(ellipse 40% 35% at -10% 60%, hsl(var(--primary) / 0.05), transparent 45%);
+  }
+
+  .dark .app-atmosphere {
+    background:
+      radial-gradient(ellipse 100% 65% at 50% -20%, hsl(var(--primary) / 0.14), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 105% 95%, hsl(var(--primary) / 0.09), transparent 48%),
+      radial-gradient(ellipse 35% 30% at -5% 40%, hsl(var(--primary) / 0.06), transparent 42%);
+  }
+
+  .app-content-layer {
+    position: relative;
+    z-index: 1;
   }
 }

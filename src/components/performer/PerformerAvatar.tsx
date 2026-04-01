@@ -28,7 +28,7 @@ export function PerformerAvatar({ name, imageUrl, size = 'md', className }: Perf
   return (
     <span
       className={cn(
-        'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-sky-600/40 to-violet-600/35 font-semibold text-white ring-1 ring-white/15',
+        'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/45 to-primary/20 font-medium text-primary-foreground ring-1 ring-border',
         sizeClass[size],
         className
       )}

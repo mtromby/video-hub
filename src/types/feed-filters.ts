@@ -1,4 +1,4 @@
-/** Per storage_path: catalog junctions (empty sets if clip is not in Supabase). */
+/** Per feed item key (see feedItemFilterKey): catalog junctions; empty sets if unknown. */
 export type FeedPathAnnotation = {
   performerIds: Set<string>
   categoryIds: Set<string>

@@ -241,17 +241,12 @@ export function CatalogVideoEditorForm({
             className="flex-1 font-mono text-[13px]"
           />
           {showBrowse && onPickerOpenChange ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="shrink-0 border-white/15 bg-transparent text-zinc-200"
-              onClick={() => onPickerOpenChange(true)}
-            >
+            <Button type="button" variant="outline" className="shrink-0" onClick={() => onPickerOpenChange(true)}>
               Browse
             </Button>
           ) : null}
         </div>
-        <p className="text-[11px] text-zinc-500">
+        <p className="text-[11px] text-muted-foreground">
           Same key as in your manifest or bucket listing (not the full https URL).
         </p>
         {previewUrl ? (
@@ -259,7 +254,7 @@ export function CatalogVideoEditorForm({
             href={previewUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-block text-xs text-violet-400 underline-offset-2 hover:underline"
+            className="inline-block text-xs text-primary underline-offset-2 hover:underline"
           >
             Open public URL
           </a>
@@ -295,7 +290,7 @@ export function CatalogVideoEditorForm({
         <Button
           type="button"
           variant="outline"
-          className="border-white/15 bg-transparent text-xs text-zinc-300"
+          className="text-xs"
           onClick={() =>
             setEditor((x) => ({
               ...x,
@@ -317,15 +312,15 @@ export function CatalogVideoEditorForm({
         />
       </div>
 
-      <section className="rounded-2xl border border-sky-500/20 bg-zinc-950/70 p-4">
-        <h3 className="text-sm font-medium text-white">Performers</h3>
-        <p className="mt-0.5 text-xs text-zinc-500">
+      <section className="rounded-2xl border border-primary/25 bg-card/70 p-4">
+        <h3 className="text-sm font-medium text-foreground">Performers</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Tap to attach or detach. Create a new performer below — they will be linked to this video
           automatically.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {performersSorted.length === 0 ? (
-            <p className="text-sm text-zinc-500">No performers yet — add your first below.</p>
+            <p className="text-sm text-muted-foreground">No performers yet — add your first below.</p>
           ) : (
             performersSorted.map((perf) => {
               const on = editor.performerIds.has(perf.id)
@@ -336,8 +331,8 @@ export function CatalogVideoEditorForm({
                   onClick={() => togglePerformer(perf.id)}
                   className={`inline-flex max-w-full items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-xs font-medium transition-colors ${
                     on
-                      ? 'border-sky-500/60 bg-sky-500/15 text-sky-100'
-                      : 'border-white/15 bg-black/30 text-zinc-400 hover:border-white/25 hover:text-zinc-200'
+                      ? 'border-primary/55 bg-primary/15 text-foreground'
+                      : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/30 hover:text-foreground'
                   }`}
                 >
                   <PerformerAvatar name={perf.name} imageUrl={perf.image_url} size="sm" />
@@ -349,8 +344,8 @@ export function CatalogVideoEditorForm({
         </div>
 
         {onTaxonomyRefresh && supabase ? (
-          <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <div className="mt-4 space-y-2 border-t border-border pt-4">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               New performer
             </p>
             <PerformerFormFields
@@ -367,7 +362,7 @@ export function CatalogVideoEditorForm({
             <Button
               type="button"
               size="sm"
-              className="w-full rounded-lg bg-sky-600/90 text-white hover:bg-sky-600 sm:w-auto"
+              className="w-full rounded-lg sm:w-auto"
               disabled={newPerfBusy}
               onClick={() => void createPerformerInline()}
             >
@@ -377,15 +372,15 @@ export function CatalogVideoEditorForm({
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4">
-        <h3 className="text-sm font-medium text-white">Categories</h3>
-        <p className="mt-0.5 text-xs text-zinc-500">
+      <section className="rounded-2xl border border-border bg-card/70 p-4">
+        <h3 className="text-sm font-medium text-foreground">Categories</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Tap to attach or detach. Create a new one below — it will be attached to this video
           automatically.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {categories.length === 0 ? (
-            <p className="text-sm text-zinc-500">No categories yet — add your first below.</p>
+            <p className="text-sm text-muted-foreground">No categories yet — add your first below.</p>
           ) : (
             categories.map((c) => {
               const on = editor.categoryIds.has(c.id)
@@ -396,8 +391,8 @@ export function CatalogVideoEditorForm({
                   onClick={() => toggleCategory(c.id)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     on
-                      ? 'border-violet-500/60 bg-violet-500/20 text-violet-100'
-                      : 'border-white/15 bg-black/30 text-zinc-400 hover:border-white/25 hover:text-zinc-200'
+                      ? 'border-primary/55 bg-primary/18 text-foreground'
+                      : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/30 hover:text-foreground'
                   }`}
                 >
                   {c.name}
@@ -408,8 +403,8 @@ export function CatalogVideoEditorForm({
         </div>
 
         {onTaxonomyRefresh && supabase ? (
-          <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <div className="mt-4 space-y-2 border-t border-border pt-4">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               New category
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -441,7 +436,7 @@ export function CatalogVideoEditorForm({
             <Button
               type="button"
               size="sm"
-              className="w-full rounded-lg bg-violet-600/90 text-white hover:bg-violet-600 sm:w-auto"
+              className="w-full rounded-lg sm:w-auto"
               disabled={newCatBusy}
               onClick={() => void createCategoryInline()}
             >
@@ -451,9 +446,9 @@ export function CatalogVideoEditorForm({
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4">
-        <h3 className="text-sm font-medium text-white">Tags</h3>
-        <p className="mt-0.5 text-xs text-zinc-500">
+      <section className="rounded-2xl border border-border bg-card/70 p-4">
+        <h3 className="text-sm font-medium text-foreground">Tags</h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Grouped by category. Create a tag below — it will be attached to this video automatically.
         </p>
         <div className="mt-4 space-y-4">
@@ -462,7 +457,7 @@ export function CatalogVideoEditorForm({
             if (list.length === 0) return null
             return (
               <div key={c.id}>
-                <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                   {c.name}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -475,8 +470,8 @@ export function CatalogVideoEditorForm({
                         onClick={() => toggleTag(t.id)}
                         className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
                           on
-                            ? 'border-amber-500/50 bg-amber-500/15 text-amber-100'
-                            : 'border-white/10 bg-black/20 text-zinc-400 hover:border-white/20'
+                            ? 'border-primary/45 bg-primary/12 text-foreground'
+                            : 'border-border bg-muted/40 text-muted-foreground hover:border-primary/25'
                         }`}
                       >
                         {t.name}
@@ -488,7 +483,7 @@ export function CatalogVideoEditorForm({
             )
           })}
           {allTagsCount === 0 ? (
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted-foreground">
               {categories.length === 0
                 ? 'Add a category above, then create tags here.'
                 : 'No tags yet — add your first below.'}
@@ -497,10 +492,10 @@ export function CatalogVideoEditorForm({
         </div>
 
         {onTaxonomyRefresh && supabase ? (
-          <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">New tag</p>
+          <div className="mt-4 space-y-2 border-t border-border pt-4">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">New tag</p>
             {categories.length === 0 ? (
-              <p className="text-xs text-zinc-500">Create a category first.</p>
+              <p className="text-xs text-muted-foreground">Create a category first.</p>
             ) : (
               <>
                 <div className="space-y-1">
@@ -509,7 +504,7 @@ export function CatalogVideoEditorForm({
                     id={p('new-tag-cat')}
                     value={newTagCategoryId}
                     onChange={(e) => setNewTagCategoryId(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50"
+                    className="h-10 w-full rounded-xl border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -545,7 +540,7 @@ export function CatalogVideoEditorForm({
                 <Button
                   type="button"
                   size="sm"
-                  className="w-full rounded-lg bg-amber-600/90 text-white hover:bg-amber-600 sm:w-auto"
+                  className="w-full rounded-lg sm:w-auto"
                   disabled={newTagBusy || !newTagCategoryId}
                   onClick={() => void createTagInline()}
                 >

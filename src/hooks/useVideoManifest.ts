@@ -12,6 +12,7 @@ import {
   parseGcsBucketFromPublicBase,
 } from '@/lib/gcs-xml-list'
 import { parseInlineVideoSources } from '@/lib/inline-video-sources'
+import { shuffled } from '@/lib/shuffle-array'
 import type { VideoItem, VideoManifestEntry } from '@/types/video'
 
 function isAbortError(e: unknown): boolean {
@@ -33,17 +34,6 @@ function normalizeEntry(entry: VideoManifestEntry, index: number, base: string):
     title: entry.title,
     performer: entry.performer,
   }
-}
-
-/** Random order for the feed (new shuffle each successful load / reload). */
-function shuffled<T>(items: T[]): T[] {
-  if (items.length <= 1) return [...items]
-  const a = [...items]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
 }
 
 function parseManifest(json: unknown, base: string): VideoItem[] {

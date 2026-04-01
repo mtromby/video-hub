@@ -73,43 +73,43 @@ export function BucketPathPicker({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/50 p-0 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="bucket-picker-title"
     >
       <div
-        className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-3xl border border-white/10 bg-zinc-950 shadow-2xl sm:rounded-3xl"
+        className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-3xl border border-border bg-card shadow-2xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <h2 id="bucket-picker-title" className="text-sm font-semibold text-white">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h2 id="bucket-picker-title" className="text-sm font-medium text-foreground">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-sm text-zinc-400 hover:bg-white/10 hover:text-white"
+            className="rounded-lg px-2 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           >
             Close
           </button>
         </div>
 
-        <div className="border-b border-white/10 p-3 space-y-2">
+        <div className="space-y-2 border-b border-border p-3">
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter paths…"
-            className="h-10 w-full rounded-xl border border-white/10 bg-black px-3 text-sm text-white placeholder:text-zinc-600 outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50"
+            className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
           {existingPaths && existingPaths.size > 0 ? (
-            <label className="flex items-center gap-2 text-xs text-zinc-400">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
               <input
                 type="checkbox"
                 checked={newOnly}
                 onChange={(e) => setNewOnly(e.target.checked)}
-                className="rounded border-white/20"
+                className="rounded border-input"
               />
               Only paths not in catalog yet
             </label>
@@ -118,11 +118,11 @@ export function BucketPathPicker({
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
           {loading ? (
-            <p className="px-2 py-6 text-center text-sm text-zinc-500">Loading bucket sources…</p>
+            <p className="px-2 py-6 text-center text-sm text-muted-foreground">Loading bucket sources…</p>
           ) : error ? (
-            <p className="px-2 py-4 text-sm text-red-400">{error}</p>
+            <p className="px-2 py-4 text-sm text-destructive">{error}</p>
           ) : filtered.length === 0 ? (
-            <p className="px-2 py-6 text-center text-sm text-zinc-500">No paths match.</p>
+            <p className="px-2 py-6 text-center text-sm text-muted-foreground">No paths match.</p>
           ) : (
             <ul className="space-y-0.5">
               {filtered.map((p) => {
@@ -147,12 +147,12 @@ export function BucketPathPicker({
                       }}
                       className={cn(
                         'flex w-full items-start gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition-colors',
-                        mode === 'multi' && isOn && 'bg-violet-500/25 ring-1 ring-violet-400/40',
-                        mode === 'multi' && !isOn && 'hover:bg-white/5',
+                        mode === 'multi' && isOn && 'bg-primary/20 ring-1 ring-primary/40',
+                        mode === 'multi' && !isOn && 'hover:bg-muted/80',
                         mode === 'single' &&
                           (exists
-                            ? 'bg-white/5 text-zinc-400 hover:bg-white/10'
-                            : 'text-zinc-100 hover:bg-violet-500/15')
+                            ? 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                            : 'text-foreground hover:bg-primary/10')
                       )}
                     >
                       {mode === 'multi' ? (
@@ -160,8 +160,8 @@ export function BucketPathPicker({
                           className={cn(
                             'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded border text-[10px]',
                             isOn
-                              ? 'border-violet-400 bg-violet-500 text-white'
-                              : 'border-white/20 bg-black/40'
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-muted/80'
                           )}
                           aria-hidden
                         >
@@ -173,14 +173,14 @@ export function BucketPathPicker({
                       </span>
                       {mode === 'single' ? (
                         exists ? (
-                          <span className="shrink-0 rounded-md bg-zinc-800 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-zinc-500">
+                          <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
                             in DB
                           </span>
                         ) : (
-                          <span className="shrink-0 text-violet-400">Use</span>
+                          <span className="shrink-0 text-primary">Use</span>
                         )
                       ) : exists ? (
-                        <span className="shrink-0 rounded-md bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
+                        <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                           in DB
                         </span>
                       ) : null}
@@ -192,11 +192,11 @@ export function BucketPathPicker({
           )}
         </div>
 
-        <div className="border-t border-white/10 p-3 space-y-2">
+        <div className="space-y-2 border-t border-border p-3">
           {mode === 'multi' ? (
             <Button
               type="button"
-              className="w-full rounded-xl bg-violet-600 text-white hover:bg-violet-500"
+              className="w-full rounded-xl"
               disabled={selected.size === 0}
               onClick={() => {
                 onBulkImport?.(Array.from(selected))
@@ -206,12 +206,7 @@ export function BucketPathPicker({
               Import {selected.size} video{selected.size === 1 ? '' : 's'}
             </Button>
           ) : null}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-white/15 bg-transparent text-zinc-300"
-            onClick={onClose}
-          >
+          <Button type="button" variant="outline" className="w-full" onClick={onClose}>
             Cancel
           </Button>
         </div>

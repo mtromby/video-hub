@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { getSupabase } from '@/lib/supabase'
@@ -18,16 +19,24 @@ export function LoginPage() {
 
   if (!configured) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-black px-6 text-center">
-        <h1 className="text-lg font-semibold text-white">Sign in unavailable</h1>
-        <p className="max-w-sm text-sm text-zinc-400">
-          Set <code className="text-zinc-300">VITE_SUPABASE_URL</code> and{' '}
-          <code className="text-zinc-300">VITE_SUPABASE_ANON_KEY</code> in your environment,
-          then restart the dev server.
-        </p>
-        <Button asChild variant="outline" className="border-white/20 bg-transparent text-white">
-          <Link to="/">Back</Link>
-        </Button>
+      <div className="relative flex min-h-dvh flex-col bg-background">
+        <div className="app-atmosphere" aria-hidden />
+        <div className="app-content-layer relative flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <div className="absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-10">
+            <ThemeToggle />
+          </div>
+          <div className="max-w-md space-y-5 rounded-3xl border border-border/80 bg-card/80 p-10 shadow-2xl backdrop-blur-md">
+            <h1 className="text-2xl font-light tracking-tight text-foreground">Sign in unavailable</h1>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Set <code className="rounded-md bg-muted px-1.5 py-0.5 text-foreground">VITE_SUPABASE_URL</code> and{' '}
+              <code className="rounded-md bg-muted px-1.5 py-0.5 text-foreground">VITE_SUPABASE_ANON_KEY</code> in
+              your environment, then restart the dev server.
+            </p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/">Back</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     )
   }
@@ -51,69 +60,85 @@ export function LoginPage() {
     }
   }
 
+  const inputClass =
+    'h-12 w-full rounded-2xl border-2 border-input bg-card/90 px-4 text-sm text-foreground shadow-inner shadow-foreground/[0.02] placeholder:text-muted-foreground outline-none transition-colors focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/30'
+
   return (
-    <div className="flex min-h-dvh flex-col bg-black">
-      <div className="flex flex-1 flex-col justify-center px-6 pb-24">
-        <div className="mx-auto w-full max-w-sm space-y-8">
-          <div className="space-y-1 text-center">
-            <h1 className="text-xl font-semibold tracking-tight text-white">Admin sign in</h1>
-            <p className="text-sm text-zinc-500">Use your Supabase Auth credentials.</p>
+    <div className="relative flex min-h-dvh flex-col bg-background">
+      <div className="app-atmosphere" aria-hidden />
+      <div className="app-content-layer relative flex flex-1 flex-col">
+        <div className="absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-10">
+          <ThemeToggle />
+        </div>
+        <div className="flex flex-1 flex-col justify-center px-6 py-16 pb-28">
+          <div className="mx-auto w-full max-w-sm">
+            <div className="overflow-hidden rounded-[1.75rem] border border-border/80 bg-card/85 shadow-2xl shadow-foreground/10 backdrop-blur-xl dark:shadow-black/50">
+              <div className="h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/60" aria-hidden />
+              <div className="space-y-8 px-8 py-10">
+                <div className="space-y-2 text-center">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+                    Catalog
+                  </p>
+                  <h1 className="text-2xl font-light tracking-tight text-foreground">Admin sign in</h1>
+                  <p className="text-sm text-muted-foreground">Supabase Auth credentials</p>
+                </div>
+
+                <form onSubmit={onSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <label htmlFor="login-email" className="text-xs font-medium text-muted-foreground">
+                      Email
+                    </label>
+                    <input
+                      id="login-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className={inputClass}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="login-password" className="text-xs font-medium text-muted-foreground">
+                      Password
+                    </label>
+                    <input
+                      id="login-password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className={inputClass}
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  {error ? (
+                    <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive" role="alert">
+                      {error}
+                    </p>
+                  ) : null}
+
+                  <Button type="submit" disabled={submitting || loading} className="h-12 w-full text-base">
+                    {submitting ? 'Signing in…' : 'Sign in'}
+                  </Button>
+                </form>
+
+                <p className="text-center text-sm text-muted-foreground">
+                  <Link
+                    to="/"
+                    className="font-medium text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+                  >
+                    Back to app
+                  </Link>
+                </p>
+              </div>
+            </div>
           </div>
-
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="login-email" className="text-xs font-medium text-zinc-400">
-                Email
-              </label>
-              <input
-                id="login-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white placeholder:text-zinc-600 outline-none ring-white/20 focus-visible:ring-2"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="login-password" className="text-xs font-medium text-zinc-400">
-                Password
-              </label>
-              <input
-                id="login-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white placeholder:text-zinc-600 outline-none ring-white/20 focus-visible:ring-2"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {error ? (
-              <p className="text-sm text-red-400" role="alert">
-                {error}
-              </p>
-            ) : null}
-
-            <Button
-              type="submit"
-              disabled={submitting || loading}
-              className="h-11 w-full rounded-xl bg-white text-black hover:bg-zinc-200"
-            >
-              {submitting ? 'Signing in…' : 'Sign in'}
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-zinc-500">
-            <Link to="/" className="text-zinc-300 underline-offset-4 hover:underline">
-              Back to app
-            </Link>
-          </p>
         </div>
       </div>
     </div>

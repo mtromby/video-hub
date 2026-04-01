@@ -200,7 +200,7 @@ export function VideosPanel() {
           <Button
             type="button"
             variant="ghost"
-            className="text-zinc-400 hover:bg-white/10 hover:text-white"
+            className="text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             onClick={() => {
               setView('list')
               setFormError(null)
@@ -208,7 +208,7 @@ export function VideosPanel() {
           >
             ← Back
           </Button>
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-xl font-light tracking-tight text-foreground">
             {editor.id ? 'Edit video' : 'New video'}
           </h2>
         </div>
@@ -232,7 +232,7 @@ export function VideosPanel() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             type="button"
-            className="flex-1 rounded-xl bg-violet-600 text-white hover:bg-violet-500"
+            className="flex-1 rounded-xl"
             disabled={saving}
             onClick={() => void saveVideo()}
           >
@@ -242,7 +242,7 @@ export function VideosPanel() {
             <Button
               type="button"
               variant="outline"
-              className="border-red-500/40 text-red-400 hover:bg-red-500/10"
+              className="border-destructive/40 text-destructive hover:bg-destructive/10"
               disabled={saving}
               onClick={() => {
                 const v = videos.find((x) => x.id === editor.id)
@@ -263,8 +263,8 @@ export function VideosPanel() {
   return (
     <div className="flex flex-col gap-4 pb-8">
       <div>
-        <h2 className="text-lg font-semibold text-white">Videos</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h2 className="text-xl font-light tracking-tight text-foreground">Videos</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Link GCS object keys to titles, slugs, categories, and tags for your feed and filters.
         </p>
       </div>
@@ -272,7 +272,7 @@ export function VideosPanel() {
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button
           type="button"
-          className="flex-1 rounded-xl bg-violet-600 text-white hover:bg-violet-500"
+          className="flex-1 rounded-xl"
           onClick={openNew}
         >
           + New video
@@ -280,7 +280,7 @@ export function VideosPanel() {
         <Button
           type="button"
           variant="outline"
-          className="flex-1 border-white/15 bg-transparent text-zinc-200"
+          className="flex-1"
           onClick={() => setBulkOpen(true)}
           disabled={saving}
         >
@@ -288,13 +288,13 @@ export function VideosPanel() {
         </Button>
       </div>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {loading ? (
-        <p className="text-sm text-zinc-500">Loading catalog…</p>
+        <p className="text-sm text-muted-foreground">Loading catalog…</p>
       ) : videos.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 py-14 text-center">
-          <p className="text-sm text-zinc-400">No videos in the catalog yet.</p>
-          <p className="mt-2 text-xs text-zinc-600">
+        <div className="rounded-2xl border border-dashed border-border py-14 text-center">
+          <p className="text-sm text-muted-foreground">No videos in the catalog yet.</p>
+          <p className="mt-2 text-xs text-muted-foreground/80">
             Use your GCS manifest settings, then import paths or paste a key manually.
           </p>
         </div>
@@ -305,12 +305,12 @@ export function VideosPanel() {
             return (
               <li
                 key={v.id}
-                className="rounded-2xl border border-white/10 bg-zinc-950/70 p-3"
+                className="rounded-2xl border border-border bg-card/80 p-3"
               >
                 <div
                   role="button"
                   tabIndex={0}
-                  className="w-full cursor-pointer text-left outline-none rounded-lg focus-visible:ring-2 focus-visible:ring-violet-500/50"
+                  className="w-full cursor-pointer rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => void openEdit(v)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -319,11 +319,11 @@ export function VideosPanel() {
                     }
                   }}
                 >
-                  <p className="font-medium text-white">{v.title}</p>
-                  <p className="mt-0.5 line-clamp-2 font-mono text-[11px] text-zinc-500">
+                  <p className="font-medium text-foreground">{v.title}</p>
+                  <p className="mt-0.5 line-clamp-2 font-mono text-[11px] text-muted-foreground">
                     {v.storage_path}
                   </p>
-                  <p className="mt-1 font-mono text-[10px] text-violet-400/90">{v.slug}</p>
+                  <p className="mt-1 font-mono text-[10px] text-primary">{v.slug}</p>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {url ? (
@@ -331,7 +331,7 @@ export function VideosPanel() {
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs text-violet-400 underline-offset-2 hover:underline"
+                      className="text-xs text-primary underline-offset-2 hover:underline"
                     >
                       Open file
                     </a>
@@ -340,7 +340,7 @@ export function VideosPanel() {
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="ml-auto border-white/15 text-xs text-zinc-300"
+                    className="ml-auto text-xs"
                     onClick={() => void openEdit(v)}
                   >
                     Edit

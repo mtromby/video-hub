@@ -1,5 +1,5 @@
+import { getAnnotationForVideoItem } from '@/lib/feed-annotation'
 import { matchPerformerIdsFromHint } from '@/lib/catalog-helpers'
-import { storagePathFromVideoSrc } from '@/lib/fetch-gcs-storage-paths'
 import type { FeedFilterSelections, FeedPathAnnotation } from '@/types/feed-filters'
 import type { CatalogPerformer } from '@/types/catalog'
 import type { VideoItem } from '@/types/video'
@@ -34,10 +34,7 @@ function passesCatalogPerformers(
   return false
 }
 
-function passesManifestPerformers(
-  item: VideoItem,
-  selectedLiterals: string[]
-): boolean {
+function passesManifestPerformers(item: VideoItem, selectedLiterals: string[]): boolean {
   if (selectedLiterals.length === 0) return true
   const hint = item.performer?.trim().toLowerCase()
   if (!hint) return false
@@ -57,18 +54,14 @@ function passesPerformerDimension(
   if (!wantCat && !wantMan) return true
 
   const okCat = !wantCat || passesCatalogPerformers(item, ann, catSel, performers)
-  const okMan =
-    !wantMan || passesManifestPerformers(item, selections.manifestPerformerLiterals)
+  const okMan = !wantMan || passesManifestPerformers(item, selections.manifestPerformerLiterals)
 
   if (wantCat && wantMan) return okCat && okMan
   if (wantCat) return okCat
   return okMan
 }
 
-function passesCategories(
-  ann: FeedPathAnnotation | undefined,
-  selected: Set<string>
-): boolean {
+function passesCategories(ann: FeedPathAnnotation | undefined, selected: Set<string>): boolean {
   if (selected.size === 0) return true
   if (!ann?.categoryIds.size) return false
   for (const id of selected) {
@@ -98,14 +91,13 @@ function passesTags(
 
 export function videoMatchesFeedFilters(
   item: VideoItem,
-  path: string | null,
-  annotationByPath: Map<string, FeedPathAnnotation>,
+  annotationByFeedKey: Map<string, FeedPathAnnotation>,
   selections: FeedFilterSelections,
   performers: CatalogPerformer[]
 ): boolean {
   if (!hasAnySelection(selections)) return true
 
-  const ann = path ? annotationByPath.get(path) : undefined
+  const ann = getAnnotationForVideoItem(item, annotationByFeedKey)
   const catSel = new Set(selections.categoryIds)
   const tagSel = new Set(selections.tagIds)
 
@@ -118,12 +110,9 @@ export function videoMatchesFeedFilters(
 export function applyFeedFilters(
   videos: VideoItem[],
   selections: FeedFilterSelections,
-  annotationByPath: Map<string, FeedPathAnnotation>,
+  annotationByFeedKey: Map<string, FeedPathAnnotation>,
   performers: CatalogPerformer[]
 ): VideoItem[] {
   if (!hasAnySelection(selections)) return videos
-  return videos.filter((item) => {
-    const path = storagePathFromVideoSrc(item.src)
-    return videoMatchesFeedFilters(item, path, annotationByPath, selections, performers)
-  })
+  return videos.filter((item) => videoMatchesFeedFilters(item, annotationByFeedKey, selections, performers))
 }

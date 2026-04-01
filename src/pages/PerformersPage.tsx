@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Settings2 } from 'lucide-react'
 
 import { ManagePerformerDialog } from '@/components/performer/ManagePerformerDialog'
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
@@ -32,20 +33,22 @@ function PerformerPortraitPhoto({
   const showImg = Boolean(src) && !broken
 
   return (
-    <div className="relative aspect-[3/4] w-full bg-zinc-950">
+    <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted/40">
       {showImg ? (
         <img
           src={src}
           alt=""
-          className="absolute inset-0 h-full w-full object-contain object-center"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.02]"
           onError={() => setBroken(true)}
         />
       ) : (
         <div
-          className="flex h-full w-full items-center justify-center bg-gradient-to-b from-sky-900/35 to-violet-950/50"
+          className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 via-primary/8 to-transparent"
           aria-hidden
         >
-          <span className="text-4xl font-semibold tracking-tight text-white/35 sm:text-5xl">
+          <span className="text-4xl font-light tracking-tight text-primary/40 sm:text-5xl">
             {performerInitials(name)}
           </span>
         </div>
@@ -104,9 +107,12 @@ export function PerformersPage() {
 
   if (!configured) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
-        <h1 className="text-lg font-semibold text-white">Performers</h1>
-        <p className="max-w-sm text-sm text-zinc-500">
+      <div className="flex h-full flex-col items-center justify-center gap-4 px-8 pb-24 text-center">
+        <div className="pointer-events-none absolute right-3 top-[max(0.5rem,env(safe-area-inset-top))] z-10">
+          <ThemeToggle className="pointer-events-auto" />
+        </div>
+        <h1 className="text-xl font-light text-foreground">Performers</h1>
+        <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
           Add Supabase environment variables to load the catalog.
         </p>
       </div>
@@ -115,61 +121,55 @@ export function PerformersPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="shrink-0 border-b border-white/10 px-4 py-4">
+      <header className="shrink-0 border-b border-border/70 bg-background/80 px-4 pb-4 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-2xl">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight text-white">Performers</h1>
-            <p className="mt-0.5 text-xs text-zinc-500">
+          <div className="min-w-0 pt-1">
+            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">Roster</p>
+            <h1 className="mt-1 text-2xl font-light tracking-tight text-foreground">Performers</h1>
+            <p className="mt-1.5 max-w-[16rem] text-xs leading-relaxed text-muted-foreground">
               {showAdminChrome
-                ? 'Portrait photos fill each card. Use the gear to edit name, slug, or image.'
+                ? 'Tap the gear on a card to edit. Portrait area shows catalog images.'
                 : 'Creators and featured performers in your catalog.'}
             </p>
           </div>
-          {showAdminChrome ? (
-            <Button
-              type="button"
-              size="sm"
-              className="shrink-0 gap-1.5 rounded-xl bg-sky-600/90 text-white hover:bg-sky-600"
-              onClick={openCreate}
-            >
-              <Plus className="size-4" />
-              Add
-            </Button>
-          ) : null}
+          <div className="flex shrink-0 items-center gap-2 pt-1">
+            <ThemeToggle />
+            {showAdminChrome ? (
+              <Button type="button" size="sm" className="gap-1.5 shadow-md shadow-primary/15" onClick={openCreate}>
+                <Plus className="size-4" strokeWidth={2.5} />
+                Add
+              </Button>
+            ) : null}
+          </div>
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-28 pt-5">
         {loading ? (
-          <p className="py-12 text-center text-sm text-zinc-500">Loading performers…</p>
+          <p className="py-16 text-center text-sm text-muted-foreground">Loading performers…</p>
         ) : loadErr ? (
-          <p className="py-12 text-center text-sm text-red-400">{loadErr}</p>
+          <p className="py-16 text-center text-sm text-destructive">{loadErr}</p>
         ) : sorted.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-            <p className="text-sm text-zinc-500">No performers in the catalog yet.</p>
+          <div className="flex flex-col items-center justify-center gap-5 py-20 text-center">
+            <p className="text-sm text-muted-foreground">No performers in the catalog yet.</p>
             {showAdminChrome ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/15 bg-transparent text-zinc-200"
-                onClick={openCreate}
-              >
+              <Button type="button" variant="outline" onClick={openCreate}>
                 Add your first performer
               </Button>
             ) : null}
           </div>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
+          <ul className="grid grid-cols-2 gap-4 sm:gap-5">
             {sorted.map((p) => (
               <li key={p.id}>
-                <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-lg shadow-black/40 ring-1 ring-white/5 transition hover:border-sky-500/35 hover:ring-sky-500/15">
+                <article className="group flex flex-col overflow-hidden rounded-3xl border border-border/80 bg-card/90 shadow-md shadow-foreground/[0.04] ring-1 ring-transparent transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-lg hover:shadow-primary/10 hover:ring-primary/15 dark:shadow-black/30">
                   <div className="relative min-h-0 flex-1">
                     {showAdminChrome ? (
                       <Button
                         type="button"
                         size="icon"
-                        variant="ghost"
-                        className="absolute right-1.5 top-1.5 z-10 size-8 rounded-full border border-white/10 bg-black/45 text-zinc-200 backdrop-blur-sm hover:bg-black/60 hover:text-white"
+                        variant="secondary"
+                        className="absolute right-2 top-2 z-10 size-9 rounded-full border border-border/80 bg-background/85 shadow-md backdrop-blur-md"
                         aria-label={`Manage ${p.name}`}
                         onClick={() => openEdit(p)}
                       >
@@ -178,8 +178,8 @@ export function PerformersPage() {
                     ) : null}
                     <PerformerPortraitPhoto name={p.name} imageUrl={p.image_url} />
                   </div>
-                  <div className="shrink-0 border-t border-white/10 bg-black/80 px-2 py-2.5">
-                    <p className="truncate text-center text-sm font-medium text-white">{p.name}</p>
+                  <div className="shrink-0 border-t border-border/60 bg-muted/25 px-3 py-3">
+                    <p className="truncate text-center text-sm font-medium tracking-tight text-foreground">{p.name}</p>
                   </div>
                 </article>
               </li>

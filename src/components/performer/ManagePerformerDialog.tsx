@@ -113,7 +113,7 @@ export function ManagePerformerDialog({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm dark:bg-black/70"
         aria-label="Close dialog"
         onClick={onClose}
       />
@@ -121,18 +121,18 @@ export function ManagePerformerDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="manage-performer-title"
-        className="relative flex max-h-[min(88dvh,560px)] w-full max-w-lg flex-col rounded-t-3xl border border-sky-500/20 bg-zinc-950 shadow-2xl sm:rounded-3xl"
+        className="relative flex max-h-[min(88dvh,560px)] w-full max-w-lg flex-col rounded-t-3xl border border-primary/25 bg-card shadow-2xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-3 pr-2">
-          <h2 id="manage-performer-title" className="text-base font-semibold text-white">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3 pr-2">
+          <h2 id="manage-performer-title" className="text-base font-medium text-foreground">
             {title}
           </h2>
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className="shrink-0 text-zinc-400 hover:bg-white/10 hover:text-white"
+            className="shrink-0 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             aria-label="Close"
             onClick={onClose}
           >
@@ -142,8 +142,8 @@ export function ManagePerformerDialog({
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
           <div className="space-y-4">
-            <section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+            <section className="rounded-2xl border border-border bg-muted/30 p-4">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 Profile
               </p>
               <div className="mt-3">
@@ -162,21 +162,10 @@ export function ManagePerformerDialog({
             </section>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/15 bg-transparent text-zinc-200"
-                disabled={busy}
-                onClick={onClose}
-              >
+              <Button type="button" variant="outline" disabled={busy} onClick={onClose}>
                 Cancel
               </Button>
-              <Button
-                type="button"
-                className="bg-sky-600/90 text-white hover:bg-sky-600"
-                disabled={busy}
-                onClick={() => void onSubmit()}
-              >
+              <Button type="button" disabled={busy} onClick={() => void onSubmit()}>
                 {busy ? 'Saving…' : performer ? 'Save changes' : 'Create performer'}
               </Button>
             </div>

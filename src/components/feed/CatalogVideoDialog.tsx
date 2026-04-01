@@ -211,7 +211,7 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+        className="absolute inset-0 bg-foreground/45 backdrop-blur-sm dark:bg-black/70"
         aria-label="Close dialog"
         onClick={onClose}
       />
@@ -219,12 +219,12 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
         role="dialog"
         aria-modal="true"
         aria-labelledby="catalog-video-dialog-title"
-        className="relative flex max-h-[min(92dvh,720px)] w-full max-w-lg flex-col rounded-t-3xl border border-white/10 bg-zinc-950 shadow-2xl sm:rounded-3xl"
+        className="relative flex max-h-[min(92dvh,720px)] w-full max-w-lg flex-col rounded-t-3xl border border-border bg-card shadow-2xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 flex-col gap-1 border-b border-white/10 px-4 py-3 pr-2">
+        <div className="flex shrink-0 flex-col gap-1 border-b border-border px-4 py-3 pr-2">
           <div className="flex items-center justify-between gap-3">
-            <h2 id="catalog-video-dialog-title" className="text-base font-semibold text-white">
+            <h2 id="catalog-video-dialog-title" className="text-base font-medium text-foreground">
               {loading
                 ? 'Catalog'
                 : catalogMode === 'update'
@@ -235,7 +235,7 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
               type="button"
               size="icon"
               variant="ghost"
-              className="shrink-0 text-zinc-400 hover:bg-white/10 hover:text-white"
+              className="shrink-0 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               aria-label="Close"
               onClick={onClose}
             >
@@ -243,7 +243,7 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
             </Button>
           </div>
           {!loading && catalogMode === 'update' ? (
-            <p className="pr-10 text-xs text-zinc-500">
+            <p className="pr-10 text-xs text-muted-foreground">
               This clip is already in your catalog — edits here update that entry.
             </p>
           ) : null}
@@ -251,7 +251,7 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
           {loading ? (
-            <p className="py-8 text-center text-sm text-zinc-500">Loading catalog…</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Loading catalog…</p>
           ) : (
             <div className="flex flex-col gap-5 pb-2">
               <CatalogVideoEditorForm
@@ -270,21 +270,10 @@ export function CatalogVideoDialog({ open, onClose, sourceItem }: CatalogVideoDi
                 onTaxonomyRefresh={refreshTaxonomyOnly}
               />
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-white/15 bg-transparent text-zinc-200"
-                  disabled={saving}
-                  onClick={onClose}
-                >
+                <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
                   Cancel
                 </Button>
-                <Button
-                  type="button"
-                  className="bg-violet-600 text-white hover:bg-violet-500"
-                  disabled={saving}
-                  onClick={() => void onSave()}
-                >
+                <Button type="button" disabled={saving} onClick={() => void onSave()}>
                   {saving
                     ? 'Saving…'
                     : catalogMode === 'update'

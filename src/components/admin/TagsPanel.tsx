@@ -157,8 +157,8 @@ export function TagsPanel() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h2 className="text-lg font-semibold text-white">Tags</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h2 className="text-xl font-light tracking-tight text-foreground">Tags</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Tags live inside a category. Videos link to individual tags.
         </p>
       </div>
@@ -169,7 +169,7 @@ export function TagsPanel() {
           id="tag-category"
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className="h-10 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50"
+          className="h-10 w-full rounded-xl border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {categories.length === 0 ? (
             <option value="">No categories yet</option>
@@ -185,9 +185,9 @@ export function TagsPanel() {
 
       <form
         onSubmit={onCreate}
-        className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4 space-y-3"
+        className="space-y-3 rounded-2xl border border-border bg-card/90 p-4"
       >
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Add tag {activeCategory ? `to “${activeCategory.name}”` : ''}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -219,25 +219,25 @@ export function TagsPanel() {
         <Button
           type="submit"
           disabled={saving || !categoryId}
-          className="w-full rounded-xl bg-violet-600 text-white hover:bg-violet-500"
+          className="w-full rounded-xl"
         >
           {saving ? 'Saving…' : 'Add tag'}
         </Button>
       </form>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {loading ? (
-        <p className="text-sm text-zinc-500">Loading categories…</p>
+        <p className="text-sm text-muted-foreground">Loading categories…</p>
       ) : !categoryId ? (
-        <p className="text-sm text-zinc-500">Add a category first to manage tags.</p>
+        <p className="text-sm text-muted-foreground">Add a category first to manage tags.</p>
       ) : loadingTags ? (
-        <p className="text-sm text-zinc-500">Loading tags…</p>
+        <p className="text-sm text-muted-foreground">Loading tags…</p>
       ) : (
         <ul className="space-y-2">
           {tags.map((t) => (
             <li
               key={t.id}
-              className="rounded-2xl border border-white/10 bg-zinc-950/60 p-3"
+              className="rounded-2xl border border-border bg-card/70 p-3"
             >
               {editingId === t.id ? (
                 <div className="space-y-2">
@@ -248,7 +248,6 @@ export function TagsPanel() {
                     <Button
                       type="button"
                       size="sm"
-                      className="bg-violet-600 text-white"
                       onClick={() => void saveEdit()}
                       disabled={saving}
                     >
@@ -258,7 +257,7 @@ export function TagsPanel() {
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-white/15 bg-transparent text-zinc-300"
+                      className="bg-transparent"
                       onClick={() => setEditingId(null)}
                     >
                       Cancel
@@ -268,15 +267,15 @@ export function TagsPanel() {
               ) : (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="font-medium text-white">{t.name}</p>
-                    <p className="font-mono text-xs text-violet-300/90">{t.slug}</p>
+                    <p className="font-medium text-foreground">{t.name}</p>
+                    <p className="font-mono text-xs text-primary">{t.slug}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-white/15 bg-transparent text-xs text-zinc-200"
+                      className="bg-transparent text-xs"
                       onClick={() => startEdit(t)}
                     >
                       Edit
@@ -285,7 +284,7 @@ export function TagsPanel() {
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-red-500/30 text-xs text-red-400"
+                      className="border-destructive/30 text-xs text-destructive"
                       onClick={() => void remove(t.id, t.name)}
                     >
                       Delete
@@ -296,7 +295,7 @@ export function TagsPanel() {
             </li>
           ))}
           {tags.length === 0 ? (
-            <li className="rounded-2xl border border-dashed border-white/10 py-8 text-center text-sm text-zinc-500">
+            <li className="rounded-2xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
               No tags in this category yet.
             </li>
           ) : null}

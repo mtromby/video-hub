@@ -132,17 +132,17 @@ export function CategoriesPanel() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h2 className="text-lg font-semibold text-white">Categories</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h2 className="text-xl font-light tracking-tight text-foreground">Categories</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Top-level groups. Tags belong to one category; videos can link many categories.
         </p>
       </div>
 
       <form
         onSubmit={onCreate}
-        className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4 space-y-3"
+        className="space-y-3 rounded-2xl border border-border bg-card/90 p-4"
       >
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Add category</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Add category</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5 sm:col-span-2">
             <FieldLabel htmlFor="cat-name">Name</FieldLabel>
@@ -188,21 +188,21 @@ export function CategoriesPanel() {
         <Button
           type="submit"
           disabled={saving}
-          className="w-full rounded-xl bg-violet-600 text-white hover:bg-violet-500"
+          className="w-full rounded-xl"
         >
           {saving ? 'Saving…' : 'Add category'}
         </Button>
       </form>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {loading ? (
-        <p className="text-sm text-zinc-500">Loading…</p>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
         <ul className="space-y-2">
           {rows.map((c) => (
             <li
               key={c.id}
-              className="rounded-2xl border border-white/10 bg-zinc-950/60 p-3"
+              className="rounded-2xl border border-border bg-card/70 p-3"
             >
               {editingId === c.id ? (
                 <div className="space-y-2">
@@ -219,7 +219,7 @@ export function CategoriesPanel() {
                     <Button
                       type="button"
                       size="sm"
-                      className="rounded-lg bg-violet-600 text-white"
+                      className="rounded-lg"
                       onClick={() => void saveEdit()}
                       disabled={saving}
                     >
@@ -229,7 +229,7 @@ export function CategoriesPanel() {
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-white/15 bg-transparent text-zinc-300"
+                      className="bg-transparent"
                       onClick={() => setEditingId(null)}
                     >
                       Cancel
@@ -239,19 +239,19 @@ export function CategoriesPanel() {
               ) : (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="font-medium text-white">{c.name}</p>
-                    <p className="font-mono text-xs text-violet-300/90">{c.slug}</p>
+                    <p className="font-medium text-foreground">{c.name}</p>
+                    <p className="font-mono text-xs text-primary">{c.slug}</p>
                     {c.description ? (
-                      <p className="mt-1 text-xs text-zinc-500">{c.description}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{c.description}</p>
                     ) : null}
-                    <p className="mt-1 text-[11px] text-zinc-600">Sort: {c.sort_order}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground/80">Sort: {c.sort_order}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-white/15 bg-transparent text-xs text-zinc-200"
+                      className="bg-transparent text-xs"
                       onClick={() => startEdit(c)}
                     >
                       Edit
@@ -260,7 +260,7 @@ export function CategoriesPanel() {
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="border-red-500/30 bg-transparent text-xs text-red-400 hover:bg-red-500/10"
+                      className="border-destructive/30 bg-transparent text-xs text-destructive hover:bg-destructive/10"
                       onClick={() => void remove(c.id, c.name)}
                     >
                       Delete

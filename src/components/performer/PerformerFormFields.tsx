@@ -52,7 +52,7 @@ export function PerformerFormFields({
           rows={2}
           className="resize-y font-mono text-[13px]"
         />
-        <p className="text-[11px] text-zinc-500">Optional. Use a direct image link (HTTPS).</p>
+        <p className="text-[11px] text-muted-foreground">Optional. Use a direct image link (HTTPS).</p>
       </div>
     </div>
   )

@@ -12,10 +12,7 @@ export function FieldLabel({
   className?: string
 }) {
   return (
-    <label
-      htmlFor={htmlFor}
-      className={cn('block text-xs font-medium text-zinc-400', className)}
-    >
+    <label htmlFor={htmlFor} className={cn('block text-xs font-medium text-muted-foreground', className)}>
       {children}
     </label>
   )
@@ -28,7 +25,7 @@ export function FieldInput({
   return (
     <input
       className={cn(
-        'h-10 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white placeholder:text-zinc-600 outline-none ring-violet-500/40 focus-visible:ring-2',
+        'h-11 w-full rounded-2xl border-2 border-input bg-card/95 px-3.5 text-sm text-foreground shadow-inner shadow-foreground/[0.02] placeholder:text-muted-foreground outline-none transition-colors focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-primary/25',
         className
       )}
       {...props}
@@ -43,7 +40,7 @@ export function FieldTextarea({
   return (
     <textarea
       className={cn(
-        'min-h-[88px] w-full resize-y rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600 outline-none ring-violet-500/40 focus-visible:ring-2',
+        'min-h-[88px] w-full resize-y rounded-2xl border-2 border-input bg-card/95 px-3.5 py-2.5 text-sm text-foreground shadow-inner shadow-foreground/[0.02] placeholder:text-muted-foreground outline-none transition-colors focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-primary/25',
         className
       )}
       {...props}
@@ -54,7 +51,7 @@ export function FieldTextarea({
 export function FieldError({ children }: { children: ReactNode }) {
   if (!children) return null
   return (
-    <p className="text-xs text-red-400" role="alert">
+    <p className="text-xs text-destructive" role="alert">
       {children}
     </p>
   )

@@ -38,3 +38,14 @@ export type CatalogPerformer = {
   created_at: string
   updated_at: string
 }
+
+export type CatalogClip = {
+  id: string
+  video_id: string
+  start_seconds: number
+  title: string
+  slug: string
+  description: string | null
+  created_at: string
+  updated_at: string
+}

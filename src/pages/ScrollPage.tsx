@@ -1,72 +1,104 @@
-import { Loader2, RefreshCw } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Loader2, RefreshCw, VideoOff } from 'lucide-react'
 
 import { ScrollFeedWithFilters } from '@/components/feed/ScrollFeedWithFilters'
 import { Button } from '@/components/ui/button'
+import { useMergedScrollFeed } from '@/hooks/useMergedScrollFeed'
 import { useVideoManifest } from '@/hooks/useVideoManifest'
 import { hasVideoBucketOrSourcesConfig } from '@/lib/env'
+import { getSupabaseConfig } from '@/lib/supabase'
+
+const codeClass = 'rounded-md bg-muted/90 px-1.5 py-0.5 font-mono text-[11px] text-foreground'
+
+function StatePanel({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: typeof VideoOff
+  title: string
+  children: ReactNode
+}) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-6 px-8 pb-28 text-center">
+      <div className="relative">
+        <div className="absolute -inset-6 rounded-full bg-primary/10 blur-2xl" aria-hidden />
+        <div className="relative flex size-16 items-center justify-center rounded-2xl border border-primary/20 bg-card/80 shadow-lg backdrop-blur-sm">
+          <Icon className="size-8 text-primary" strokeWidth={1.25} aria-hidden />
+        </div>
+      </div>
+      <div className="max-w-sm space-y-3">
+        <h2 className="text-xl font-light tracking-tight text-foreground">{title}</h2>
+        <div className="flex flex-col gap-4 text-sm leading-relaxed text-muted-foreground">{children}</div>
+      </div>
+    </div>
+  )
+}
 
 export function ScrollPage() {
-  const { videos, loading, error, reload } = useVideoManifest()
+  const { videos: manifestVideos, loading: manifestLoading, error: manifestError, reload } =
+    useVideoManifest()
+  const { feedVideos, reloadClips, clipsError, clipsLoading } = useMergedScrollFeed(manifestVideos)
   const configured = hasVideoBucketOrSourcesConfig()
+  const supabaseConfigured = Boolean(getSupabaseConfig())
+  const feedLoading = manifestLoading || (supabaseConfigured && clipsLoading)
 
   if (!configured) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-lg font-medium text-white">Connect your bucket</p>
-        <p className="max-w-sm text-sm text-zinc-400">
-          {import.meta.env.PROD ? (
-            <>
-              This site was built without video env vars. In your GitHub repo, open Settings → Secrets and variables →
-              Actions and add the same <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_*</code> names
-              you use in local <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">.env</code> (at minimum{' '}
-              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_VIDEO_SOURCES</code> or{' '}
-              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_GCS_PUBLIC_BASE_URL</code> plus manifest
-              / listing vars per <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">.env.example</code>). Then
-              push to <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">main</code> or re-run the Pages
-              workflow so the build picks them up.
-            </>
-          ) : (
-            <>
-              In <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">.env</code>, set either{' '}
-              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_VIDEO_SOURCES</code> (comma-separated
-              URLs or paths) or <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_GCS_PUBLIC_BASE_URL</code>{' '}
-              (for <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">manifest.json</code>, or set{' '}
-              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">VITE_GCS_USE_XML_LIST=true</code> for public
-              bucket listing). Then restart <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">npm run dev</code>.
-            </>
-          )}
+      <StatePanel icon={VideoOff} title="Connect your bucket">
+        {import.meta.env.PROD ? (
+          <>
+            This build has no video env vars. In GitHub: Settings → Secrets and variables → Actions — add the same{' '}
+            <code className={codeClass}>VITE_*</code> keys as local <code className={codeClass}>.env</code> (see{' '}
+            <code className={codeClass}>.env.example</code>), then redeploy.
+          </>
+        ) : (
+          <>
+            In <code className={codeClass}>.env</code>, set <code className={codeClass}>VITE_VIDEO_SOURCES</code> or{' '}
+            <code className={codeClass}>VITE_GCS_PUBLIC_BASE_URL</code> (and listing vars as needed). Restart{' '}
+            <code className={codeClass}>npm run dev</code>.
+          </>
+        )}
+      </StatePanel>
+    )
+  }
+
+  if (feedLoading) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 pb-28 text-muted-foreground">
+        <Loader2 className="size-10 animate-spin text-primary" aria-hidden />
+        <p className="text-sm font-medium tracking-wide">Loading feed…</p>
+      </div>
+    )
+  }
+
+  const emptyFeed = feedVideos.length === 0
+  const blockingError =
+    emptyFeed && (manifestError ?? (clipsError && !manifestVideos.length ? clipsError : null))
+
+  if (emptyFeed) {
+    return (
+      <StatePanel icon={VideoOff} title="Couldn&apos;t load videos">
+        <p>
+          {blockingError ??
+            'No videos in manifest and no playable clips. Add manifest entries or catalog clips.'}
         </p>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 text-zinc-400">
-        <Loader2 className="size-8 animate-spin" aria-hidden />
-        <p className="text-sm">Loading feed…</p>
-      </div>
-    )
-  }
-
-  if (error || videos.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-lg font-medium text-white">Couldn&apos;t load videos</p>
-        <p className="max-w-sm text-sm text-zinc-400">{error ?? 'No videos in manifest.'}</p>
         <Button
           type="button"
           variant="secondary"
           size="sm"
-          className="gap-2"
-          onClick={() => void reload()}
+          className="mt-4 gap-2"
+          onClick={() => {
+            void reload()
+            reloadClips()
+          }}
         >
           <RefreshCw className="size-4" aria-hidden />
           Retry
         </Button>
-      </div>
+      </StatePanel>
     )
   }
 
-  return <ScrollFeedWithFilters videos={videos} />
+  return <ScrollFeedWithFilters videos={feedVideos} clipsLoadError={clipsError} />
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { storagePathFromVideoSrc } from '@/lib/fetch-gcs-storage-paths'
+import { feedItemFilterKey } from '@/lib/feed-item-filter-key'
 import { normalizeCatalogPerformers } from '@/lib/normalize-catalog-performer'
 import { getSupabase } from '@/lib/supabase'
 import type { FeedPathAnnotation } from '@/types/feed-filters'
@@ -13,7 +13,8 @@ type LoadState = {
   categories: CatalogCategory[]
   tags: CatalogTag[]
   performers: CatalogPerformer[]
-  annotationByPath: Map<string, FeedPathAnnotation>
+  /** Keyed by feedItemFilterKey(item). */
+  annotationByFeedKey: Map<string, FeedPathAnnotation>
 }
 
 const empty: LoadState = {
@@ -22,29 +23,36 @@ const empty: LoadState = {
   categories: [],
   tags: [],
   performers: [],
-  annotationByPath: new Map(),
+  annotationByFeedKey: new Map(),
 }
 
 export function useFeedCatalogFilterData(videos: VideoItem[]) {
-  const pathsKey = useMemo(() => {
-    const s = new Set<string>()
+  const keysKey = useMemo(() => {
+    const keys = new Set<string>()
     for (const v of videos) {
-      const p = storagePathFromVideoSrc(v.src)
-      if (p) s.add(p)
+      keys.add(feedItemFilterKey(v))
     }
-    return JSON.stringify([...s].sort())
+    return JSON.stringify([...keys].sort())
   }, [videos])
 
   const [state, setState] = useState<LoadState>(empty)
 
   const reload = useCallback(async () => {
-    const paths = JSON.parse(pathsKey) as string[]
-    const supabase = getSupabase()
+    const feedKeys = JSON.parse(keysKey) as string[]
+    const paths = new Set<string>()
+    const clipIds: string[] = []
+    for (const k of feedKeys) {
+      if (k.startsWith('path:')) {
+        paths.add(k.slice('path:'.length))
+      } else if (k.startsWith('clip:')) {
+        clipIds.push(k.slice('clip:'.length))
+      }
+    }
 
     const emptyAnnotations = (): Map<string, FeedPathAnnotation> =>
       new Map(
-        paths.map((p) => [
-          p,
+        feedKeys.map((key) => [
+          key,
           {
             performerIds: new Set<string>(),
             categoryIds: new Set<string>(),
@@ -53,17 +61,19 @@ export function useFeedCatalogFilterData(videos: VideoItem[]) {
         ])
       )
 
-    if (paths.length === 0) {
-      setState({ ...empty, loading: false, annotationByPath: new Map() })
+    if (feedKeys.length === 0) {
+      setState({ ...empty, loading: false, annotationByFeedKey: new Map() })
       return
     }
+
+    const supabase = getSupabase()
 
     if (!supabase) {
       setState({
         ...empty,
         loading: false,
         error: null,
-        annotationByPath: emptyAnnotations(),
+        annotationByFeedKey: emptyAnnotations(),
       })
       return
     }
@@ -74,7 +84,9 @@ export function useFeedCatalogFilterData(videos: VideoItem[]) {
       supabase.from('categories').select('*').order('sort_order', { ascending: true }).order('name'),
       supabase.from('tags').select('*').order('name'),
       supabase.from('performers').select('*').order('name'),
-      supabase.from('videos').select('id, storage_path').in('storage_path', paths),
+      paths.size > 0
+        ? supabase.from('videos').select('id, storage_path').in('storage_path', [...paths])
+        : Promise.resolve({ data: [], error: null } as const),
     ])
 
     if (cRes.error || tRes.error || pRes.error || vRes.error) {
@@ -102,14 +114,7 @@ export function useFeedCatalogFilterData(videos: VideoItem[]) {
     }
     const videoIds = rows.map((r) => r.id)
 
-    const byPath = new Map<string, FeedPathAnnotation>()
-    for (const p of paths) {
-      byPath.set(p, {
-        performerIds: new Set<string>(),
-        categoryIds: new Set<string>(),
-        tagIds: new Set<string>(),
-      })
-    }
+    const byKey = emptyAnnotations()
 
     if (videoIds.length > 0) {
       const [vpRes, vcRes, vtRes] = await Promise.all([
@@ -126,23 +131,92 @@ export function useFeedCatalogFilterData(videos: VideoItem[]) {
         })
         return
       }
-      const add = (videoId: string, fn: (ann: FeedPathAnnotation) => void) => {
+      const addPath = (videoId: string, fn: (ann: FeedPathAnnotation) => void) => {
         const path = pathByVideoId.get(videoId)
         if (!path) return
-        const ann = byPath.get(path)
+        const ann = byKey.get(`path:${path}`)
         if (ann) fn(ann)
       }
       for (const r of vpRes.data ?? []) {
         const row = r as { video_id: string; performer_id: string }
-        add(row.video_id, (a) => a.performerIds.add(row.performer_id))
+        addPath(row.video_id, (a) => a.performerIds.add(row.performer_id))
       }
       for (const r of vcRes.data ?? []) {
         const row = r as { video_id: string; category_id: string }
-        add(row.video_id, (a) => a.categoryIds.add(row.category_id))
+        addPath(row.video_id, (a) => a.categoryIds.add(row.category_id))
       }
       for (const r of vtRes.data ?? []) {
         const row = r as { video_id: string; tag_id: string }
-        add(row.video_id, (a) => a.tagIds.add(row.tag_id))
+        addPath(row.video_id, (a) => a.tagIds.add(row.tag_id))
+      }
+    }
+
+    if (clipIds.length > 0) {
+      const [clipsRes, ccRes, ctRes] = await Promise.all([
+        supabase.from('clips').select('id, video_id').in('id', clipIds),
+        supabase.from('clip_categories').select('clip_id, category_id').in('clip_id', clipIds),
+        supabase.from('clip_tags').select('clip_id, tag_id').in('clip_id', clipIds),
+      ])
+      if (clipsRes.error || ccRes.error || ctRes.error) {
+        setState({
+          ...empty,
+          loading: false,
+          error:
+            clipsRes.error?.message ?? ccRes.error?.message ?? ctRes.error?.message ?? 'Failed to load clips',
+        })
+        return
+      }
+
+      const clipRows = (clipsRes.data ?? []) as { id: string; video_id: string }[]
+      const clipVideoIds = [...new Set(clipRows.map((c) => c.video_id))]
+
+      let vpForClips: { video_id: string; performer_id: string }[] = []
+      if (clipVideoIds.length > 0) {
+        const vpRes = await supabase
+          .from('video_performers')
+          .select('video_id, performer_id')
+          .in('video_id', clipVideoIds)
+        if (vpRes.error) {
+          setState({
+            ...empty,
+            loading: false,
+            error: vpRes.error.message,
+          })
+          return
+        }
+        vpForClips = (vpRes.data ?? []) as { video_id: string; performer_id: string }[]
+      }
+
+      const performersByVideoId = new Map<string, Set<string>>()
+      for (const r of vpForClips) {
+        let s = performersByVideoId.get(r.video_id)
+        if (!s) {
+          s = new Set()
+          performersByVideoId.set(r.video_id, s)
+        }
+        s.add(r.performer_id)
+      }
+
+      for (const c of clipRows) {
+        const ann = byKey.get(`clip:${c.id}`)
+        if (!ann) continue
+        const pset = performersByVideoId.get(c.video_id)
+        if (pset) {
+          for (const pid of pset) {
+            ann.performerIds.add(pid)
+          }
+        }
+      }
+
+      for (const r of ccRes.data ?? []) {
+        const row = r as { clip_id: string; category_id: string }
+        const ann = byKey.get(`clip:${row.clip_id}`)
+        if (ann) ann.categoryIds.add(row.category_id)
+      }
+      for (const r of ctRes.data ?? []) {
+        const row = r as { clip_id: string; tag_id: string }
+        const ann = byKey.get(`clip:${row.clip_id}`)
+        if (ann) ann.tagIds.add(row.tag_id)
       }
     }
 
@@ -152,9 +226,9 @@ export function useFeedCatalogFilterData(videos: VideoItem[]) {
       categories,
       tags,
       performers,
-      annotationByPath: byPath,
+      annotationByFeedKey: byKey,
     })
-  }, [pathsKey])
+  }, [keysKey])
 
   useEffect(() => {
     const id = window.setTimeout(() => void reload(), 0)
